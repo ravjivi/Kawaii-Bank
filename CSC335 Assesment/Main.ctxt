@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Main
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+comment2.params=lower\ upper
+comment2.target=int\ intChecker(int,\ int)
+comment3.params=
+comment3.target=void\ createAccount()
+comment4.params=
+comment4.target=void\ closeAccount()
+comment5.params=name
+comment5.target=boolean\ verifyAccount(java.lang.String)
+numComments=6
