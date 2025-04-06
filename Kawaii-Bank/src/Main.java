@@ -17,7 +17,7 @@ public class Main
 
     public static void main(String[] args) {
         CSV.readCSV(); // Read the CSV file and store to the ArrayList
-        System.out.println("Hello, welcome to Kawaii-Bank. How can I help you? 1-5");
+        System.out.println("Hello, welcome to Kawaii-Bank. How can I help you? 1-6");
         askCustomer();
     }
 
@@ -53,9 +53,9 @@ public class Main
         keyboard.nextLine();
         System.out.println("Would you like any other assitance, y/n");
         String input = keyboard.nextLine();
-        if (input.equals("y")) {
+        if (input.toLowerCase().equals("y")) {
             askCustomer();
-        } else if (input.equals("n")) {
+        } else if (input.toLowerCase().equals("n")) {
             dailySummary();
         }
     }
@@ -83,6 +83,7 @@ public class Main
         String name;
         String accountType;
         String address;
+        String city;
         System.out.println("What is your full name");
         keyboard.nextLine();
         while(!keyboard.hasNextLine())  {
@@ -98,16 +99,14 @@ public class Main
         if (temp == 2) {accountType = "Savings";}
         if (temp == 3) {accountType = "Current";} 
         else {accountType = "Everyday";} // In case accountType is null
-        
-        System.out.println("What is your address");
+
         keyboard.nextLine();
-        while (!keyboard.hasNextLine())  {
-                keyboard.nextLine();
-                System.out.println("Please enter a String");
-        } 
+        System.out.println("What is your address");
         address = keyboard.nextLine();
+        System.out.println("What is your city");
+        city = keyboard.nextLine();
         System.out.println("Thank you for opening an account with us "+name);
-        accountsList.add(new Accounts(name, accountType, address));
+        accountsList.add(new Accounts(name, address+" "+city, accountType));
         askCustomer2();
     }
     
@@ -171,7 +170,7 @@ public class Main
         //Print total balance of all accounts
         double balTotal = 0;
         for (int i=0; i<accountsList.size(); i++) {
-            balTotal += accountsList.get(i).getBalance();  
+            balTotal += accountsList.get(i).getBalance(); 
         }
         System.out.println("Total cash in the bank: $"+df.format(balTotal));
 
@@ -179,7 +178,7 @@ public class Main
         System.out.println("Net cash deposited/withdrawn: $"+df.format(netDepWith));
 
         //write to csv
-        CSV.wrtieCSV();
+        CSV.writeCSV();
     }
     
     

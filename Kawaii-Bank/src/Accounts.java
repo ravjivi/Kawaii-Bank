@@ -24,6 +24,16 @@ public class Accounts
         this.customerName = customerName;
         this.customerAddress = customerAddress;
         this.accountType = accountType;
+        this.accountBalance = 0;
+        this.accountNumber= createAccNum();
+    }
+    private String createAccNum() {
+        int endInt = 0;
+        if (accountType.equals("Savings")) {endInt = 0;}
+        else if (accountType.equals("Everyday")) {endInt = 1;}
+        else if (accountType.equals("Current")) {endInt = 2;}
+        int midInt = (int)Math.floor(Math.random()*1000000);
+        return("08-0101-"+midInt+"-"+"0"+endInt);
     }
     
     public static int returnIndex(String id) {
