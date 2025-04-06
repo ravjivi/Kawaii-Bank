@@ -22,5 +22,9 @@ public class CSV
             System.out.println("Error: "+e);
         }
     }
+
+    public static void wrtieCSV() {
+        
+    }
     
 }

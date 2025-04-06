@@ -7,43 +7,57 @@
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 public class Main
 {
     public static ArrayList<Accounts> accountsList = new ArrayList<Accounts>(); // Public so it can be referred in any class
     private static Scanner keyboard = new Scanner(System.in);
-    public static DecimalFormat df = new DecimalFormat("0.00"); // Formats the output to 2dp
+    private static DecimalFormat df = new DecimalFormat("0.00"); // Formats the output to 2dp
+    private static double netDepWith; // Net Deposits and withdrawals
+
     public static void main(String[] args) {
         CSV.readCSV(); // Read the CSV file and store to the ArrayList
         System.out.println("Hello, welcome to Kawaii-Bank. How can I help you? 1-5");
-        System.out.println("1. Create an account for a new customer\n2. Close an account for an existing customer\n"+
-                            "3. Get the balance of a customers's account\n4. Deposit into an account\n5. Withdraw from an account\n"+
-                            "6. Quit");
-        int input = intChecker(1,5);
-        
-        switch(input) {
-            case 1: // Create acc
-                createAccount();
-                break;
-            case 2: // Close acc
-                closeAccount();
-                break;
-            case 3: // Get balance
-                findBalance();
-                break;
-            case 4: // Deposit
-                deposit();
-                break;
-            case 5: // Withdraw
-                withdraw();
-                break;
-            case 6: // Quit
-                
-                break;
-            default:
-                System.out.println("Error with input");
-                input = intChecker(1,5);
-        }
+        askCustomer();
+    }
 
+    private static void askCustomer() {
+        System.out.println("1. Create an account for a new customer\n2. Close an account for an existing customer\n"+
+                            "3. Get the balance of a customers's account\n4. Deposit into an account\n"+
+                            "5. Withdraw from an account\n6. Quit");
+        int input = intChecker(1,6);
+
+        switch(input) {
+        case 1: // Create acc
+            createAccount();
+            break;
+        case 2: // Close acc
+            closeAccount();
+            break;
+        case 3: // Get balance
+            findBalance();
+            break;
+        case 4: // Deposit
+            deposit();
+            break;
+        case 5: // Withdraw
+            withdraw();
+            break;
+        case 6: // Quit
+            dailySummary();
+            break;
+        }
+    }
+
+    private static void askCustomer2() {
+        keyboard.nextLine();
+        System.out.println("Would you like any other assitance, y/n");
+        String input = keyboard.nextLine();
+        if (input.equals("y")) {
+            askCustomer();
+        } else if (input.equals("n")) {
+            dailySummary();
+        }
     }
     
     private static int intChecker(int lower, int upper) {
@@ -92,16 +106,18 @@ public class Main
                 System.out.println("Please enter a String");
         } 
         address = keyboard.nextLine();
+        System.out.println("Thank you for opening an account with us "+name);
         accountsList.add(new Accounts(name, accountType, address));
-        
+        askCustomer2();
     }
     
-    public static void closeAccount() {
+    private static void closeAccount() {
         System.out.println("What is the full name of the account you would like to close");
         String accName = keyboard.nextLine().toLowerCase();
        
         System.out.println("This account is now closed");
-        accountsList.remove(Accounts.returnIndex(accName));     
+        accountsList.remove(Accounts.returnIndex(accName));    
+        askCustomer2(); 
     }
     
     /* 
@@ -119,14 +135,15 @@ public class Main
         return false;
     } */
 
-    public static void findBalance() {
+    private static void findBalance() {
         keyboard.nextLine();
         System.out.println("What is the name of your account");
         String accName = keyboard.nextLine().toLowerCase();
         System.out.println("Balance: $"+df.format(accountsList.get(Accounts.returnIndex(accName)).getBalance()));
+        askCustomer2();
     }
 
-    public static void deposit() {
+    private static void deposit() {
         keyboard.nextLine();
         System.out.println("What is the name of your account");
         String accName = keyboard.nextLine().toLowerCase();
@@ -134,9 +151,11 @@ public class Main
         Double depAmount = keyboard.nextDouble();
         accountsList.get(Accounts.returnIndex(accName)).depositToAccount(depAmount);
         System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accName)).getBalance()));
+        netDepWith += depAmount;
+        askCustomer2();
     }
 
-    public static void withdraw() {
+    private static void withdraw() {
         keyboard.nextLine();
         System.out.println("What is the name of your account");
         String accName = keyboard.nextLine().toLowerCase();
@@ -144,15 +163,24 @@ public class Main
         Double withAmount = keyboard.nextDouble();
         accountsList.get(Accounts.returnIndex(accName)).withdrawFromAccount(withAmount);
         System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accName)).getBalance()));
-
+        netDepWith -= withAmount;
+        askCustomer2();
     }
 
-    public static void dailySummary() {
+    private static void dailySummary() {
         //Print total balance of all accounts
+        double balTotal = 0;
+        for (int i=0; i<accountsList.size(); i++) {
+            balTotal += accountsList.get(i).getBalance();  
+        }
+        System.out.println("Total cash in the bank: $"+df.format(balTotal));
 
         //net dep/withdral
+        System.out.println("Net cash deposited/withdrawn: $"+df.format(netDepWith));
 
         //write to csv
+        CSV.wrtieCSV();
     }
+    
     
 }
