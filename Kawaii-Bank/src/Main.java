@@ -52,7 +52,6 @@ public class Main
     }
 
     private static void askCustomer2() {
-        keyboard.nextLine();
         System.out.println("Would you like any other assitance, y/n");
         String input = keyboard.nextLine();
         if (input.toLowerCase().equals("y")) {
@@ -63,36 +62,71 @@ public class Main
     }
     
     private static int intChecker(int lower, int upper) {
-        boolean found = false; // found valid int
-        int input;
-        while (!found) {
+        int input = 0;
+        while (true) {
             while(!keyboard.hasNextInt())  {
                 keyboard.nextLine();
                 System.out.println("Please enter a number");
             } 
             input = keyboard.nextInt(); 
             if (input >= lower && input <= upper) {
-                found = true;
-                return input;
+                break;
             } else {
                 System.out.println("Please enter a number between "+lower+" and "+upper);
             }
         }
-        return 0;
+        return input;
+    }
+    
+    private static boolean stringChecker(String text, String checker, boolean numAllowed) {
+        if (text.isBlank()) {
+            System.out.println(checker+" cannot be blank");
+            return false;
+        } else if (text.contains(",") || text.contains(".") || text.contains("/") || text.contains(";") || text.contains("'")
+                || text.contains("[") || text.contains("]") || text.contains("-") || text.contains("=") || text.contains("<")
+                || text.contains(">") || text.contains("?") || text.contains(":") || text.contains("{") || text.contains("}")
+                || text.contains("|") || text.contains("_") || text.contains("+") || text.contains("(") || text.contains(")")
+                || text.contains("!") || text.contains("@") || text.contains("#") || text.contains("$") || text.contains("%")
+                || text.contains("^") || text.contains("&") || text.contains("*") || text.contains("`") || text.contains("~")) {
+                    System.out.println(checker+" cannot contain special characters");
+                    return false;
+        } 
+        for (int i=0; i<text.length(); i++) {
+            if (Character.isDigit(text.charAt(i)) && !numAllowed) {
+                System.out.println(text);
+                System.out.println(checker+" cannot contain integers");
+                return false;
+            }
+        }
+        return true;
+    }
+    private static boolean doubleDPChecker(double number) {
+        int dp = 0;
+        String numberLine = Double.toString(number);
+        for (int i=0; i<numberLine.length(); i++) {
+            if (numberLine.charAt(i) == '.') { 
+                dp = numberLine.length() - (i+1);
+            }
+        }
+        if (dp > 2) {
+            return false;
+        } else {
+            return true;
+        }
+        
     }
     
     private static void createAccount() {
         String name;
-        String accountType;
+        String accountType = "Everday";
         String address;
         String city;
-        System.out.println("What is your full name");
         keyboard.nextLine();
-        while(!keyboard.hasNextLine())  {
-                keyboard.nextLine();
-                System.out.println("Please enter a String");
-        } 
+        System.out.println("What is your full name");
         name = keyboard.nextLine();
+        while (!stringChecker(name, "Name", false)) {
+            name = keyboard.nextLine();
+        }
         
         System.out.println("What kind of account would you like to open, 1-3");
         System.out.println("1. Everyday\n2. Savings\n3. Current");
@@ -100,24 +134,33 @@ public class Main
         if (temp == 1) {accountType = "Everyday";}
         if (temp == 2) {accountType = "Savings";}
         if (temp == 3) {accountType = "Current";} 
-        else {accountType = "Everyday";} // In case accountType is null
 
         keyboard.nextLine();
         System.out.println("What is your address");
         address = keyboard.nextLine();
+        while (!stringChecker(address, "Address", true)) {
+            address = keyboard.nextLine();
+        }
         System.out.println("What is your city");
         city = keyboard.nextLine();
+        while (!stringChecker(city, "City", false)) {
+            city = keyboard.nextLine();
+        }
         System.out.println("Thank you for opening an account with us "+name);
         accountsList.add(new Accounts(name, address+" "+city, accountType));
         askCustomer2();
     }
     
     private static void closeAccount() {
-        System.out.println("What is the full name of the account you would like to close");
-        String accName = keyboard.nextLine().toLowerCase();
-       
+        System.out.println("What is the account number/name of the account you would like to close");
+        keyboard.nextLine();
+        String accID = checkMultipleAccounts(keyboard.nextLine());
+        while (!(Accounts.returnIndex(accID) >= 0)) {
+            System.out.println("This account does not exist, Please re-enter the name of the account");
+            accID = keyboard.nextLine();
+        }
         System.out.println("This account is now closed");
-        accountsList.remove(Accounts.returnIndex(accName));    
+        accountsList.remove(Accounts.returnIndex(accID));    
         askCustomer2(); 
     }
     
@@ -140,7 +183,10 @@ public class Main
         keyboard.nextLine();
         System.out.println("What is the account number/name of your account");
         String accID = checkMultipleAccounts(keyboard.nextLine());
-        
+        while (!(Accounts.returnIndex(accID) >= 0)) {
+            System.out.println("This account does not exist, Please re-enter the name of the account");
+            accID = keyboard.nextLine();
+        }
         System.out.println("Balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
         askCustomer2();
     }
@@ -149,9 +195,26 @@ public class Main
         keyboard.nextLine();
         System.out.println("What is the account number/name of your account");
         String accID = checkMultipleAccounts(keyboard.nextLine());
-        
+        while (!(Accounts.returnIndex(accID) >= 0)) {
+            System.out.println("This account does not exist, Please re-enter the name of the account");
+            accID = keyboard.nextLine();
+        }
         System.out.println("How much would you like to deposit. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
-        Double depAmount = keyboard.nextDouble();
+        Double depAmount = 0.0;
+        while (true) {
+            if (keyboard.hasNextDouble()) {
+                depAmount = keyboard.nextDouble();
+                if (doubleDPChecker(depAmount)) {
+                    break;  
+                } else {
+                    System.out.println("We only accept money with 2 decimal places or less");
+                }
+            } else {
+                System.out.println("Please enter a integer/double");
+                keyboard.nextLine();  // Consume the invalid input
+            }
+        }
+
         accountsList.get(Accounts.returnIndex(accID)).depositToAccount(depAmount);
         System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
         netDepWith += depAmount;
@@ -162,16 +225,29 @@ public class Main
         keyboard.nextLine();
         System.out.println("What is the account number/name of your account");
         String accID = checkMultipleAccounts(keyboard.nextLine());
-        
-        System.out.println("How much would you like to withdraw. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
-        Double withAmount = keyboard.nextDouble();
-        while (withAmount > 5000) {
-            System.out.println("You cannot withdraw more than $5000");
-            withAmount = keyboard.nextDouble();
+        while (!(Accounts.returnIndex(accID) >= 0)) {
+            System.out.println("This account does not exist, Please re-enter the name of the account");
+            accID = keyboard.nextLine();
         }
-        while(checkDebt(accID, withAmount)) {
-            System.out.println("You cannot withdraw this much");
-            withAmount = keyboard.nextDouble();
+        System.out.println("How much would you like to withdraw. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
+        Double withAmount = 0.0;
+        while(true) {
+            if (keyboard.hasNextDouble()) {
+                withAmount = keyboard.nextDouble();
+                if (withAmount <= 5000) {
+                    if (checkDebt(accID, withAmount)) {
+                        if (doubleDPChecker(withAmount)) {
+                            break;
+                        } else {
+                            System.out.println("We only withdraw money with 2 decimal places or less");
+                        }
+                    } else {
+                        System.out.println("You cannot withdraw this much");
+                    }
+                } else {
+                    System.out.println("You cannot withdraw more than $5000");
+                }
+            }
         }
         accountsList.get(Accounts.returnIndex(accID)).withdrawFromAccount(withAmount);
         System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
@@ -216,9 +292,9 @@ public class Main
             || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < -1000 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Current")) { 
             // If the amount going to be withdrawn will make the balance negative for everyday or savings
             // Or if the amount withdrawn from a current account will go below a $1000 overdraft
-            return true;
-        } else {
             return false;
+        } else {
+            return true;
         }
     }
 }
