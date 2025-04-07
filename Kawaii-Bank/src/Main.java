@@ -82,15 +82,18 @@ public class Main
         if (text.isBlank()) {
             System.out.println(checker+" cannot be blank");
             return false;
-        } else if (text.contains(",") || text.contains(".") || text.contains("/") || text.contains(";") || text.contains("'")
-                || text.contains("[") || text.contains("]") || text.contains("-") || text.contains("=") || text.contains("<")
+        } else if (text.contains(",") || text.contains(".") || text.contains("/") && !numAllowed || text.contains(";") || text.contains("'")
+                || text.contains("[") || text.contains("]") || text.contains("=") || text.contains("<") || text.contains("~")
                 || text.contains(">") || text.contains("?") || text.contains(":") || text.contains("{") || text.contains("}")
                 || text.contains("|") || text.contains("_") || text.contains("+") || text.contains("(") || text.contains(")")
                 || text.contains("!") || text.contains("@") || text.contains("#") || text.contains("$") || text.contains("%")
-                || text.contains("^") || text.contains("&") || text.contains("*") || text.contains("`") || text.contains("~")) {
+                || text.contains("^") || text.contains("&") || text.contains("*") || text.contains("`")) {
                     System.out.println(checker+" cannot contain special characters");
                     return false;
-        } 
+        } else if (text.length() > 70) {
+            System.out.println("Name is too long and does not obey a NZ legal name\nIt cannot be greater than 70 characters");
+            return false;
+        }
         for (int i=0; i<text.length(); i++) {
             if (Character.isDigit(text.charAt(i)) && !numAllowed) {
                 System.out.println(text);
