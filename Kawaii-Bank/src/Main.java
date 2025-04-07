@@ -1,3 +1,5 @@
+package src;
+
 /**
  * Write a description of class Main here.
  *
@@ -7,7 +9,6 @@
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 public class Main
 {
     public static ArrayList<Accounts> accountsList = new ArrayList<Accounts>(); // Public so it can be referred in any class
@@ -16,7 +17,8 @@ public class Main
     private static double netDepWith; // Net Deposits and withdrawals
 
     public static void main(String[] args) {
-        CSV.readCSV(); // Read the CSV file and store to the ArrayList
+        CSV CSV1 = new CSV();
+        CSV1.readCSV(); // Read the CSV file and store to the ArrayList
         System.out.println("Hello, welcome to Kawaii-Bank. How can I help you? 1-6");
         askCustomer();
     }
@@ -136,32 +138,43 @@ public class Main
 
     private static void findBalance() {
         keyboard.nextLine();
-        System.out.println("What is the name of your account");
-        String accName = keyboard.nextLine().toLowerCase();
-        System.out.println("Balance: $"+df.format(accountsList.get(Accounts.returnIndex(accName)).getBalance()));
+        System.out.println("What is the account number/name of your account");
+        String accID = checkMultipleAccounts(keyboard.nextLine());
+        
+        System.out.println("Balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
         askCustomer2();
     }
 
     private static void deposit() {
         keyboard.nextLine();
-        System.out.println("What is the name of your account");
-        String accName = keyboard.nextLine().toLowerCase();
-        System.out.println("How much would you like to deposit");
+        System.out.println("What is the account number/name of your account");
+        String accID = checkMultipleAccounts(keyboard.nextLine());
+        
+        System.out.println("How much would you like to deposit. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
         Double depAmount = keyboard.nextDouble();
-        accountsList.get(Accounts.returnIndex(accName)).depositToAccount(depAmount);
-        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accName)).getBalance()));
+        accountsList.get(Accounts.returnIndex(accID)).depositToAccount(depAmount);
+        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
         netDepWith += depAmount;
         askCustomer2();
     }
 
     private static void withdraw() {
         keyboard.nextLine();
-        System.out.println("What is the name of your account");
-        String accName = keyboard.nextLine().toLowerCase();
-        System.out.println("How much would you like to withdraw");
+        System.out.println("What is the account number/name of your account");
+        String accID = checkMultipleAccounts(keyboard.nextLine());
+        
+        System.out.println("How much would you like to withdraw. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
         Double withAmount = keyboard.nextDouble();
-        accountsList.get(Accounts.returnIndex(accName)).withdrawFromAccount(withAmount);
-        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accName)).getBalance()));
+        while (withAmount > 5000) {
+            System.out.println("You cannot withdraw more than $5000");
+            withAmount = keyboard.nextDouble();
+        }
+        while(checkDebt(accID, withAmount)) {
+            System.out.println("You cannot withdraw this much");
+            withAmount = keyboard.nextDouble();
+        }
+        accountsList.get(Accounts.returnIndex(accID)).withdrawFromAccount(withAmount);
+        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
         netDepWith -= withAmount;
         askCustomer2();
     }
@@ -181,5 +194,31 @@ public class Main
         CSV.writeCSV();
     }
     
+    private static String checkMultipleAccounts(String accName) {
+        if (Character.isLetter(accName.charAt(0))) {
+            int x=0;
+            for (int i=0; i<Main.accountsList.size(); i++) {
+                if (accName.toLowerCase().equals(Main.accountsList.get(i).getName().toLowerCase())) {
+                    x++;
+                } 
+            }  
+            if (x>1) { // If there is more than 1 account listed under this name
+                System.out.println("You have multiple accounts under this name, you will need to enter the account number");
+                accName = keyboard.nextLine().toLowerCase();
+            } 
+        }
+        return accName;
+    }
     
+    private static boolean checkDebt(String accID, double withAmount) {
+        if ((accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < 0 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Savings")
+            || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < 0 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Everyday")
+            || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < -1000 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Current")) { 
+            // If the amount going to be withdrawn will make the balance negative for everyday or savings
+            // Or if the amount withdrawn from a current account will go below a $1000 overdraft
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

@@ -1,3 +1,5 @@
+package src;
+
 
 /**
  * Write a description of class CSV here.
@@ -30,16 +32,12 @@ public class CSV
             FileWriter myWriter = new FileWriter(MYCSV);
             StringBuilder tempAccountData =new StringBuilder();
             for (int i=0; i<Main.accountsList.size(); i++) {
-                tempAccountData.append(Main.accountsList.get(i).getName());
-                tempAccountData.append(",");
-                tempAccountData.append(Main.accountsList.get(i).getAddress());
-                tempAccountData.append(",");
-                tempAccountData.append(Main.accountsList.get(i).getAccountNumber());
-                tempAccountData.append(",");
-                tempAccountData.append(Main.accountsList.get(i).getAccountType());
-                tempAccountData.append(",");
+                tempAccountData.append(Main.accountsList.get(i).getName()+",");
+                tempAccountData.append(Main.accountsList.get(i).getAddress()+",");
+                tempAccountData.append(Main.accountsList.get(i).getAccountNumber()+",");
+                tempAccountData.append(Main.accountsList.get(i).getAccountType()+",");
                 tempAccountData.append(Main.accountsList.get(i).getBalance());
-                if (i<Main.accountsList.size()-1) {
+                if (i<Main.accountsList.size()-1) { // Dont break line for last line
                     tempAccountData.append("\n");
                 }
                 myWriter.write(tempAccountData.toString());
