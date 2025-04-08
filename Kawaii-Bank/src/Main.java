@@ -72,11 +72,17 @@ public class Main
     */
     private static void askCustomer2() {
         System.out.println("Would you like any other assitance, y/n");
-        String input = keyboard.nextLine();
-        if (input.toLowerCase().equals("y")) {
-            askCustomer();
-        } else if (input.toLowerCase().equals("n")) {
-            dailySummary();
+        while (true) {
+            String input = keyboard.nextLine();
+            if (input.toLowerCase().equals("y")) {
+                askCustomer();
+                break;
+            } else if (input.toLowerCase().equals("n")) {
+                dailySummary();
+                break;
+            } else {
+                System.out.println("Please enter either y or n");
+            }
         }
     }
     
