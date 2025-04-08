@@ -1,17 +1,18 @@
 package src;
 
-
-/**
- * Write a description of class CSV here.
- *
- * @author (your name)
- * @version (a version number or a date)
- */
 import java.io.*;
 import java.util.Scanner;
 public class CSV
 {
     private static final File MYCSV = new File("bankData.csv"); // Using bankData.csv file
+    
+    /**
+     * This method is called without any parameters
+     * 
+     * It is called when the program starts to read the initial CSV file using Scanner
+     * It takes each line of the CSV and splits the string by the commas
+     * It takes each part of the String and creates an accounts object 
+    */
     public static void readCSV() {
         
         try{
@@ -27,6 +28,14 @@ public class CSV
         }
     }
 
+    /**
+     * This method is called without any parameters
+     * 
+     * It is called an the end of the program to write all the data stored in the ArrayList to the CSV
+     * It uses a StringBuilder to build up a long String to write to the CSV using FileWriter
+     * Each smaller String is seperated by a comma before being added to CSV
+     * It uses a for loop make sure it writes every object in the ArrayList
+    */
     public static void writeCSV() {
         try {
             FileWriter myWriter = new FileWriter(MYCSV);
