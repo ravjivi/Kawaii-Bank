@@ -6,16 +6,25 @@ package src;
  * @Viraaj Ravji
  * 24.03.25
  */
+
+/*LIBRARY*/
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 public class Main
 {
+    /*CLASS VARIABLES*/
     public static ArrayList<Accounts> accountsList = new ArrayList<Accounts>(); // Public so it can be referred in any class
-    private static Scanner keyboard = new Scanner(System.in);
+    private static Scanner keyboard = new Scanner(System.in); // Scanner to read user inputs
     private static DecimalFormat df = new DecimalFormat("0.00"); // Formats the output to 2dp
     private static double netDepWith; // Net Deposits and withdrawals
+
+    /*CONSTANTS*/
+    // Can be changed by bankteller for the banks liking
+    private static final int OVERDRAFTLIMIT = -1000;
+    private static final String[] ACCOUNTTYPES = {"Everyday", "Savings", "Current"}; // More account types can be added by adding a new index
+
 
     /**
      * Method that is intially run to start the code
@@ -39,9 +48,9 @@ public class Main
         System.out.println("1. Create an account for a new customer\n2. Close an account for an existing customer\n"+
                             "3. Get the balance of a customers's account\n4. Deposit into an account\n"+
                             "5. Withdraw from an account\n6. Quit");
-        int input = intChecker(1,6);
+        int input = intChecker(1,6); // Uses scanner to read input and checks it is valid
 
-        switch(input) {
+        switch(input) { // Determines result based of input
         case 1: // Create acc
             createAccount();
             break;
@@ -72,15 +81,15 @@ public class Main
     */
     private static void askCustomer2() {
         System.out.println("Would you like any other assitance, y/n");
-        while (true) {
+        while (true) { // Creates a infinite loop until broken
             String input = keyboard.nextLine();
-            if (input.toLowerCase().equals("y")) {
-                askCustomer();
+            if (input.toLowerCase().equals("y") || input.toLowerCase().equals("yes")) { // If input is yes
+                askCustomer(); // Ask the user again
+                break; // End the loop
+            } else if (input.toLowerCase().equals("n") || input.toLowerCase().equals("no")) { // If input is no
+                dailySummary(); // Begins closing the brogram
                 break;
-            } else if (input.toLowerCase().equals("n")) {
-                dailySummary();
-                break;
-            } else {
+            } else { // User did not enter yes or no
                 System.out.println("Please enter either y or n");
             }
         }
@@ -97,19 +106,19 @@ public class Main
     */
     private static int intChecker(int lower, int upper) {
         int input = 0;
-        while (true) {
-            while(!keyboard.hasNextInt())  {
+        while (true) { // Creates a infinite loop until broken
+            while(!keyboard.hasNextInt())  { // If the user did not input a integer
                 keyboard.nextLine();
                 System.out.println("Please enter a number");
             } 
             input = keyboard.nextInt(); 
-            if (input >= lower && input <= upper) {
+            if (input >= lower && input <= upper) { // Checks the user entered a integer between the 2 set parameters
                 break;
-            } else {
+            } else { // The integer is outside the defined range
                 System.out.println("Please enter a number between "+lower+" and "+upper);
             }
         }
-        return input;
+        return input; // Returns the valid integer
     }
     
     /**
@@ -124,7 +133,7 @@ public class Main
      * If the string fits all the parameters, it will return true meaning it is valid
     */
     private static boolean stringChecker(String text, String checker, boolean numAllowed) {
-        if (text.isBlank()) {
+        if (text.isBlank()) { // If the text is just blank
             System.out.println(checker+" cannot be blank");
             return false;
         } else if (text.contains(",") || text.contains(".") || text.contains("/") && !numAllowed || text.contains(";") || text.contains("'")
@@ -132,21 +141,20 @@ public class Main
                 || text.contains(">") || text.contains("?") || text.contains(":") || text.contains("{") || text.contains("}")
                 || text.contains("|") || text.contains("_") || text.contains("+") || text.contains("(") || text.contains(")")
                 || text.contains("!") || text.contains("@") || text.contains("#") || text.contains("$") || text.contains("%")
-                || text.contains("^") || text.contains("&") || text.contains("*") || text.contains("`")) {
+                || text.contains("^") || text.contains("&") || text.contains("*") || text.contains("`")) { // If the text contains special characters
                     System.out.println(checker+" cannot contain special characters");
-                    return false;
-        } else if (text.length() > 70) {
+                    return false; // Does not meet the string requirements
+        } else if (text.length() > 70 && !numAllowed) { // If text is smaller bigger than legal name requirements (for names since numAllowed is false)
             System.out.println("Name is too long and does not obey a NZ legal name\nIt cannot be greater than 70 characters");
             return false;
         }
-        for (int i=0; i<text.length(); i++) {
-            if (Character.isDigit(text.charAt(i)) && !numAllowed) {
-                System.out.println(text);
+        for (int i=0; i<text.length(); i++) { // Looping through every character in the string
+            if (Character.isDigit(text.charAt(i)) && !numAllowed) { // Checks if the int contains a digit when it should not
                 System.out.println(checker+" cannot contain integers");
                 return false;
             }
         }
-        return true;
+        return true; // Return true to show the string must be valid
     }
 
     /**
@@ -160,15 +168,15 @@ public class Main
     */
     private static boolean doubleDPChecker(double number) {
         int dp = 0;
-        String numberLine = Double.toString(number);
-        for (int i=0; i<numberLine.length(); i++) {
-            if (numberLine.charAt(i) == '.') { 
-                dp = numberLine.length() - (i+1);
+        String numberLine = Double.toString(number); // Convers the double into a string so it can be split into characters(digits)
+        for (int i=0; i<numberLine.length(); i++) { // Loop through every digit
+            if (numberLine.charAt(i) == '.') {  // If the double contains a decimal point
+                dp = numberLine.length() - (i+1); // Sets dp to the number of digits after the decimal point
             }
         }
-        if (dp > 2) {
+        if (dp > 2) { // If there are more than 2 digits after the dp
             return false;
-        } else {
+        } else { // If there are 2 or less
             return true;
         }
         
@@ -182,39 +190,42 @@ public class Main
      * At the end of the method it will add a new account by creating a new accounts object to the ArrayList 
     */
     private static void createAccount() {
+        /* Define local variables for this method */
         String name;
         String accountType = "Everday";
         String address;
         String city;
         keyboard.nextLine();
         System.out.println("What is your full name");
-        name = keyboard.nextLine();
-        while (!stringChecker(name, "Name", false)) {
-            name = keyboard.nextLine();
+        name = keyboard.nextLine(); // Name of the account is what the user inputed
+        while (!stringChecker(name, "Name", false)) { // Checks it is valid for a name
+            name = keyboard.nextLine(); // Enter another name
         }
         
-        System.out.println("What kind of account would you like to open, 1-3");
-        System.out.println("1. Everyday\n2. Savings\n3. Current");
-        int temp = intChecker(1,3);
-        if (temp == 1) {accountType = "Everyday";}
-        if (temp == 2) {accountType = "Savings";}
-        if (temp == 3) {accountType = "Current";} 
+        System.out.println("What kind of account would you like to open, 1-"+ACCOUNTTYPES.length);
+        for (int i=0; i< ACCOUNTTYPES.length; i++) {
+            System.out.println((i+1)+". "+ACCOUNTTYPES[i]);
+        }
+        int temp = intChecker(1,ACCOUNTTYPES.length); // Checks int is between 1-3
+        // Defines the account tyoe based on what user chose
+        accountType = ACCOUNTTYPES[temp-1];
+        
 
         keyboard.nextLine();
-        System.out.println("What is your address");
+        System.out.println("What is your address. Enter your city in the next line");
         address = keyboard.nextLine();
-        while (!stringChecker(address, "Address", true)) {
+        while (!stringChecker(address, "Address", true)) { // Checks address is valid, also numbers are allowed
             address = keyboard.nextLine();
         }
-        System.out.println("What is your city");
+        System.out.println("What is your city"); // Asks for city seperately
         city = keyboard.nextLine();
-        while (!stringChecker(city, "City", false)) {
+        while (!stringChecker(city, "City", false)) { // Checks city is valid 
             city = keyboard.nextLine();
         }
 
         System.out.println("Thank you for opening an account with us "+name);
-        accountsList.add(new Accounts(name, address+" "+city, accountType));
-        askCustomer2();
+        accountsList.add(new Accounts(name, address+" "+city, accountType)); //Creates a new account object with 3 given parameters
+        askCustomer2(); // Will check if the user wants futher assistance
     }
     
     /**
@@ -227,14 +238,14 @@ public class Main
     private static void closeAccount() {
         System.out.println("What is the account number/name of the account you would like to close");
         keyboard.nextLine();
-        String accID = checkMultipleAccounts(keyboard.nextLine());
-        while (!(Accounts.returnIndex(accID) >= 0)) {
+        String accID = checkMultipleAccounts(keyboard.nextLine()); // Checks there aren't multiple accounts for that name
+        while (!(Accounts.returnIndex(accID) >= 0)) { // While the account does not exist
             System.out.println("This account does not exist, Please re-enter the name of the account");
-            accID = keyboard.nextLine();
+            accID = checkMultipleAccounts(keyboard.nextLine()); //Lets the user re-enter their account and checks there aren't mulitple
         }
         System.out.println("This account is now closed");
-        accountsList.remove(Accounts.returnIndex(accID));    
-        askCustomer2(); 
+        accountsList.remove(Accounts.returnIndex(accID)); //Removes the account from the ArrayList. It is removed from the CSV at the end of the program
+        askCustomer2(); // Will check if the user wants futher assistance
     }
     
     /**
@@ -247,13 +258,13 @@ public class Main
     private static void findBalance() {
         keyboard.nextLine();
         System.out.println("What is the account number/name of your account");
-        String accID = checkMultipleAccounts(keyboard.nextLine());
-        while (!(Accounts.returnIndex(accID) >= 0)) {
+        String accID = checkMultipleAccounts(keyboard.nextLine()); // Checks if the user has multiple accounts 
+        while (!(Accounts.returnIndex(accID) >= 0)) { // While the account does not exit
             System.out.println("This account does not exist, Please re-enter the name of the account");
-            accID = keyboard.nextLine();
+            accID = checkMultipleAccounts(keyboard.nextLine()); // Lets the user re-enter their account and checks there aren't mulitple
         }
-        System.out.println("Balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
-        askCustomer2();
+        System.out.println("Balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance())); // Prints the balance formatting it to 2dp
+        askCustomer2(); // Will check if the user wants futher assistance
     }
 
     /**
@@ -267,32 +278,33 @@ public class Main
     private static void deposit() {
         keyboard.nextLine();
         System.out.println("What is the account number/name of your account");
-        String accID = checkMultipleAccounts(keyboard.nextLine());
-        while (!(Accounts.returnIndex(accID) >= 0)) {
+        String accID = checkMultipleAccounts(keyboard.nextLine()); // Checks if the user has multiple accounts 
+        while (!(Accounts.returnIndex(accID) >= 0)) { // While the account does not exist
             System.out.println("This account does not exist, Please re-enter the name of the account");
             accID = keyboard.nextLine();
         }
-        System.out.println("How much would you like to deposit. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
+        System.out.println("How much would you like to deposit. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance())); // Shows their balance
         Double depAmount = 0.0;
-        while (true) {
-            if (keyboard.hasNextDouble()) {
+        while (true) { // Infinite loop
+            if (keyboard.hasNextDouble()) { // It the input is a double
                 depAmount = keyboard.nextDouble();
-                if (doubleDPChecker(depAmount)) {
-                    break;  
-                } else {
+                if (doubleDPChecker(depAmount)) { // If the deposit amount is valid
+                    break; // Break the loop because deposit is valid
+                } else { // The deposit amount is not valid
                     System.out.println("We only accept money with 2 decimal places or less");
                 }
-            } else {
+            } else { // The input is not a doubble
                 System.out.println("Please enter a integer/double");
-                keyboard.nextLine();  // Consume the invalid input
+                keyboard.nextLine();  
             }
+            // Repeats the loop
         }
 
-        accountsList.get(Accounts.returnIndex(accID)).depositToAccount(depAmount);
-        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
-        netDepWith += depAmount;
+        accountsList.get(Accounts.returnIndex(accID)).depositToAccount(depAmount); // Make the deposit with the method in the Accounts class
+        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance())); // Print the new balance
+        netDepWith += depAmount; // Update the net transactions
         keyboard.nextLine();
-        askCustomer2();
+        askCustomer2(); // Will check if the user wants futher assistance
     }
 
     /**
@@ -307,36 +319,36 @@ public class Main
     private static void withdraw() {
         keyboard.nextLine();
         System.out.println("What is the account number/name of your account");
-        String accID = checkMultipleAccounts(keyboard.nextLine());
-        while (!(Accounts.returnIndex(accID) >= 0)) {
+        String accID = checkMultipleAccounts(keyboard.nextLine()); // Checks if the user has multiple accounts 
+        while (!(Accounts.returnIndex(accID) >= 0)) { // While the account does not exist
             System.out.println("This account does not exist, Please re-enter the name of the account");
             accID = keyboard.nextLine();
         }
-        System.out.println("How much would you like to withdraw. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
+        System.out.println("How much would you like to withdraw. You currently have $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance())); // Prints the balance 
         Double withAmount = 0.0;
-        while(true) {
-            if (keyboard.hasNextDouble()) {
+        while(true) { // Infinite loop
+            if (keyboard.hasNextDouble()) { // If input is a double
                 withAmount = keyboard.nextDouble();
-                if (withAmount <= 5000) {
-                    if (checkDebt(accID, withAmount)) {
-                        if (doubleDPChecker(withAmount)) {
-                            break;
-                        } else {
+                if (withAmount <= 5000) { // If the withdrawal amount is smaller than the allowed $5000
+                    if (checkDebt(accID, withAmount)) { // If the amount withdrawn wont put the account in debt
+                        if (doubleDPChecker(withAmount)) { // If double is valid for money
+                            break; // Withdrawl amount is valid so break loop
+                        } else { // Dobule is not valid for money
                             System.out.println("We only withdraw money with 2 decimal places or less");
                         }
-                    } else {
+                    } else { // The amount withdrawn with put the account in debt
                         System.out.println("You cannot withdraw this much");
                     }
-                } else {
+                } else { // Withdrawal is greater than $5000
                     System.out.println("You cannot withdraw more than $5000");
                 }
             }
         }
-        accountsList.get(Accounts.returnIndex(accID)).withdrawFromAccount(withAmount);
-        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance()));
-        netDepWith -= withAmount;
+        accountsList.get(Accounts.returnIndex(accID)).withdrawFromAccount(withAmount); // Make the deposit with withdrawal in the Accounts class
+        System.out.println("New balance: $"+df.format(accountsList.get(Accounts.returnIndex(accID)).getBalance())); // Print the new balance
+        netDepWith -= withAmount; // Update the net transactions
         keyboard.nextLine();
-        askCustomer2();
+        askCustomer2(); // Will check if the user wants futher assistance
     }
 
     /**
@@ -352,8 +364,8 @@ public class Main
     private static void dailySummary() {
         //Print total balance of all accounts
         double balTotal = 0;
-        for (int i=0; i<accountsList.size(); i++) {
-            balTotal += accountsList.get(i).getBalance(); 
+        for (int i=0; i<accountsList.size(); i++) { // For every account in the bank
+            balTotal += accountsList.get(i).getBalance(); // Add the balances to the total
         }
         System.out.println("Total cash in the bank: $"+df.format(balTotal));
 
@@ -372,12 +384,13 @@ public class Main
      * Since a customer is able to open a savings and a everyday account, simply entering their name is not enought to differentiate the account
      * If there are multiple accounts they will need enter the account number
      * This will then return Acc ID as a new way to identify accounts
+     * There can only be 1 unique account number
     */
     private static String checkMultipleAccounts(String accName) {
-        if (Character.isLetter(accName.charAt(0))) {
+        if (Character.isLetter(accName.charAt(0))) { // If the first character is a letter (means it is an account name not a account number)
             int x=0;
-            for (int i=0; i<Main.accountsList.size(); i++) {
-                if (accName.toLowerCase().equals(Main.accountsList.get(i).getName().toLowerCase())) {
+            for (int i=0; i<Main.accountsList.size(); i++) { // Check through every account
+                if (accName.toLowerCase().equals(Main.accountsList.get(i).getName().toLowerCase())) { // If there are 2 account with the same account name
                     x++;
                 } 
             }  
@@ -386,7 +399,7 @@ public class Main
                 while (true) {
                     accName = keyboard.nextLine().toLowerCase();
                     if (accName.charAt(0) == '0' && (Accounts.returnIndex(accName) >= 0)) { // Since account numbers always start with 0
-                        return accName;
+                        return accName; // This is the new account number to identify the account
                     } else {
                         System.out.println("This is not a account number, try again");
                     }
@@ -409,12 +422,12 @@ public class Main
     private static boolean checkDebt(String accID, double withAmount) {
         if ((accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < 0 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Savings")
             || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < 0 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Everyday")
-            || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < -1000 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Current")) { 
+            || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < OVERDRAFTLIMIT &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Current")) { 
             // If the amount going to be withdrawn will make the balance negative for everyday or savings
             // Or if the amount withdrawn from a current account will go below a $1000 overdraft
             return false;
         } else {
-            return true;
+            return true; // The withdrawal is fine
         }
     }
 }
