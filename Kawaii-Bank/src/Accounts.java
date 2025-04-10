@@ -53,7 +53,7 @@ public class Accounts
         if (this.accountType.equals("Savings")) {endInt = 0;}
         else if (this.accountType.equals("Everyday")) {endInt = 1;}
         else if (this.accountType.equals("Current")) {endInt = 2;}
-        int midInt = (int)Math.floor(Math.random()*1000000); // Random 7 digit int
+        int midInt = (int)Math.floor(Math.random()*10000000); // Random 7 digit int
         return("08-0101-"+midInt+"-"+"0"+endInt); // Returns the account number
     }
 

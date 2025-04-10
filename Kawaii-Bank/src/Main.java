@@ -11,7 +11,6 @@ package src;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 public class Main
 {
     /*CLASS VARIABLES*/
@@ -48,8 +47,8 @@ public class Main
     private static void askCustomer() {
         System.out.println("1. Create an account for a new customer\n2. Close an account for an existing customer\n"+
                             "3. Get the balance of a customers's account\n4. Deposit into an account\n"+
-                            "5. Withdraw from an account\n6. Quit");
-        int input = intChecker(1,6); // Uses scanner to read input and checks it is valid
+                            "5. Withdraw from an account\n6. Print all accounts\n7. Quit");
+        int input = intChecker(1,7); // Uses scanner to read input and checks it is valid
 
         switch(input) { // Determines result based of input
         case 1: // Create acc
@@ -67,9 +66,12 @@ public class Main
         case 5: // Withdraw
             withdraw();
             break;
-        case 6: // Quit
-            dailySummary();
+        case 6: // Print accounts
+            printAccounts();
             break;
+        case 7: // Quit
+        dailySummary();
+        break;
         }
     }
 
@@ -290,7 +292,12 @@ public class Main
             if (keyboard.hasNextDouble()) { // It the input is a double
                 depAmount = keyboard.nextDouble();
                 if (doubleDPChecker(depAmount)) { // If the deposit amount is valid
-                    break; // Break the loop because deposit is valid
+                    if (depAmount > 0) { // Checks you are depositing at least $0.01
+                        break; // Break the loop because deposit is valid
+                    } else { // Deposit amount is negative or 0
+                        System.out.println("You must deposit at least $0.01");
+                    }
+                    
                 } else { // The deposit amount is not valid
                     System.out.println("We only accept money with 2 decimal places or less");
                 }
@@ -430,5 +437,50 @@ public class Main
         } else {
             return true; // The withdrawal is fine
         }
+    }
+
+    /**
+     * This method is called without any parameters
+     * 
+     * This method will print a liitle spreadsheet of call the accounts
+     * This may make it easier for the bankteller to read information rather than use the CSV
+     * It uses variables so it is very flexible depending on the lengths of some of the variables
+     * The last 3 are constant variables because they cannot exceed that length for any account
+    */
+    private static void printAccounts() {
+        // Method variables
+        int longestName = 0;
+        int longestAdd = 0;
+        // Constant because it is the same for every account
+        final int ACCNUMWIDTH = 15; 
+        final int ACCTYPEWIDTH = 8;
+        final int ACCBALWIDTH = 7;
+        for (int x=0; x<Main.accountsList.size(); x++) { // For every account
+            if (accountsList.get(x).getName().length() > longestName) { // If this account name is longer than the previos longest
+                longestName = accountsList.get(x).getName().length(); // Make this the longest so far
+            } 
+            if (accountsList.get(x).getAddress().length() > longestAdd) { // If this address is longer than the previos longest
+                longestAdd = accountsList.get(x).getAddress().length(); // Make this the longest so far
+            }
+        }
+        /* Header */
+        String format = String.format("| %%-%ds | %%-%ds | %%-%ds | %%-%ds | %%-%ds |", // ds means the string input is dependant on the digit(int) given
+        longestName, longestAdd, ACCNUMWIDTH, ACCTYPEWIDTH, ACCBALWIDTH); // Format template for the string. The 5 variables are the character spacing between '|'
+        for (int x=0; x<(longestName+longestAdd+ACCNUMWIDTH+ACCTYPEWIDTH+ACCBALWIDTH+(3*5)+(2*2)); x++) { // Since there are 5 3 character spacers and 2 end 2 character spaces that need to accouted for 
+            System.out.print("-"); 
+        }
+        System.out.println(); // Move down to next line
+
+        /* Rows */
+        for (int i=0; i<Main.accountsList.size(); i++) {
+            System.out.println(String.format(format, accountsList.get(i).getName(), accountsList.get(i).getAddress(),
+                accountsList.get(i).getAccountNumber(), accountsList.get(i).getAccountType(), "$"+accountsList.get(i).getBalance())); // Using the same format as above
+            for (int x=0; x<(longestName+longestAdd+ACCNUMWIDTH+ACCTYPEWIDTH+ACCBALWIDTH+(3*5)+(2*2)); x++) { 
+                System.out.print("-");
+            }
+            System.out.println();
+        }
+        keyboard.nextLine(); // Clear int left in scanner from before
+        askCustomer2(); // Asks if they need any more assistance
     }
 }
