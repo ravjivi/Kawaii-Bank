@@ -460,10 +460,10 @@ public class Main
         // Method variables
         int longestName = 0;
         int longestAdd = 0;
+        int longestBal = 7;
         // Constant because it is the same for every account
         final int ACCNUMWIDTH = 15; 
         final int ACCTYPEWIDTH = 8;
-        final int ACCBALWIDTH = 7;
         for (int x=0; x<Main.accountsList.size(); x++) { // For every account
             if (accountsList.get(x).getName().length() > longestName) { // If this account name is longer than the previos longest
                 longestName = accountsList.get(x).getName().length(); // Make this the longest so far
@@ -471,11 +471,18 @@ public class Main
             if (accountsList.get(x).getAddress().length() > longestAdd) { // If this address is longer than the previos longest
                 longestAdd = accountsList.get(x).getAddress().length(); // Make this the longest so far
             }
+            String numberLine = Double.toString(accountsList.get(x).getBalance()); // Convert the double to a temporary string so I can get length
+            if (numberLine.length() > longestBal) { // If this balance is longer than the previos longest
+                longestBal = numberLine.length(); // Make this the longest so far
+                if (accountsList.get(x).getBalance() < 0) { // If balance is negative
+                    longestBal += 1; // Because the negative adds a extra character
+                } 
+            }
         }
         /* Header */
         String format = String.format("| %%-%ds | %%-%ds | %%-%ds | %%-%ds | %%-%ds |", // ds means the string input is dependant on the digit(int) given
-        longestName, longestAdd, ACCNUMWIDTH, ACCTYPEWIDTH, ACCBALWIDTH); // Format template for the string. The 5 variables are the character spacing between '|'
-        for (int x=0; x<(longestName+longestAdd+ACCNUMWIDTH+ACCTYPEWIDTH+ACCBALWIDTH+(3*5)+(2*2)); x++) { // Since there are 5 3 character spacers and 2 end 2 character spaces that need to accouted for 
+        longestName, longestAdd, ACCNUMWIDTH, ACCTYPEWIDTH, longestBal); // Format template for the string. The 5 variables are the character spacing between '|'
+        for (int x=0; x<(longestName+longestAdd+longestBal+ACCNUMWIDTH+ACCTYPEWIDTH+(3*5)+(2*2)); x++) { // Since there are 5 3 character spacers and 2 end 2 character spaces that need to accouted for 
             System.out.print("-"); 
         }
         System.out.println(); // Move down to next line
@@ -484,7 +491,7 @@ public class Main
         for (int i=0; i<Main.accountsList.size(); i++) {
             System.out.println(String.format(format, accountsList.get(i).getName(), accountsList.get(i).getAddress(),
                 accountsList.get(i).getAccountNumber(), accountsList.get(i).getAccountType(), "$"+accountsList.get(i).getBalance())); // Using the same format as above
-            for (int x=0; x<(longestName+longestAdd+ACCNUMWIDTH+ACCTYPEWIDTH+ACCBALWIDTH+(3*5)+(2*2)); x++) { 
+            for (int x=0; x<(longestName+longestAdd+longestBal+ACCNUMWIDTH+ACCTYPEWIDTH+(3*5)+(2*2)); x++) { 
                 System.out.print("-");
             }
             System.out.println();
