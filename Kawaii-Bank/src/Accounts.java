@@ -45,7 +45,8 @@ public class Accounts
      * It creates a account number that is appropriate for the account
      * It uses the account type to determine the final int of the number
      * The middle interger is a large random number
-     * The 08-0101 is unique to the bank so a;; Kawaii-Bank account have this
+     * The middle interger is unique so it needs to be checked there are no duplicates
+     * The 08-0101 is unique to the bank so all Kawaii-Bank account have this
      * It then returns a account number for a account as a String
     */
     private String createAccNum() {
@@ -54,6 +55,15 @@ public class Accounts
         else if (this.accountType.equals("Everyday")) {endInt = 1;}
         else if (this.accountType.equals("Current")) {endInt = 2;}
         int midInt = (int)Math.floor(Math.random()*10000000); // Random 7 digit int
+        
+        // Checks for duplicate middle int
+        for (int i=0; i<Main.accountsList.size(); i++) {  
+            String[] splitAccNum = Main.accountsList.get(i).getAccountNumber().split("-"); // Splits the account number into a array of 4 indexs
+            if (splitAccNum[2].equals(midInt)) { // If the new middle int is the same as the middle int of another account
+                midInt = (int)Math.floor(Math.random()*10000000); // New random 7 digit int
+                i=0; //Reset the loop to check again
+            }
+        }
         return("08-0101-"+midInt+"-"+"0"+endInt); // Returns the account number
     }
 

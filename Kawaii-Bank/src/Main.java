@@ -210,10 +210,19 @@ public class Main
             System.out.println((i+1)+". "+ACCOUNTTYPES[i]);
         }
         int temp = intChecker(1,ACCOUNTTYPES.length); // Checks int is between 1-3
-        // Defines the account tyoe based on what user chose
+        // Defines the account type based on what user chose
         accountType = ACCOUNTTYPES[temp-1];
-        
 
+        // Checking for multiple accounts that will have the same name and account type
+        while (Accounts.returnIndex(name) > 0) { // While an account already exists under the new name
+            while (accountsList.get(Accounts.returnIndex(name)).getAccountType().equals(accountType)) { // While the account type of the old account is the same as the new account
+                System.out.println("You cannot create another account with the same account type under the same name");
+                temp = intChecker(1,ACCOUNTTYPES.length); // Pick new account type
+                accountType = ACCOUNTTYPES[temp-1]; 
+            } 
+            break; // Otherwise they are different so 2 accounts are allowed
+        }
+        
         keyboard.nextLine();
         System.out.println("What is your address. Enter your city in the next line");
         address = keyboard.nextLine();
