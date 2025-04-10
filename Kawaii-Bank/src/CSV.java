@@ -14,16 +14,15 @@ public class CSV
      * It takes each part of the String and creates an accounts object 
     */
     public static void readCSV() {
-        
         try{
-            Scanner myReader = new Scanner(MYCSV);
+            Scanner myReader = new Scanner(MYCSV); // Define the scanner to read CSV I defined above
             while(myReader.hasNextLine()) { // Repeat for every line in csv
-                String line = myReader.nextLine();
-                String[] tempLine = line.split(",");
+                String line = myReader.nextLine(); // Read the entire line
+                String[] tempLine = line.split(","); // Split the line by the commas
+                // Use parts of the line as parameters
                 Main.accountsList.add(new Accounts(tempLine[0], tempLine[1], tempLine[2], tempLine[3], Double.parseDouble(tempLine[4]))); 
-                //myReader.close();
             }
-        } catch(IOException e) {
+        } catch(IOException e) { // The scanner cannot read the file
             System.out.println("Error: "+e);
         }
     }
@@ -38,9 +37,10 @@ public class CSV
     */
     public static void writeCSV() {
         try {
-            FileWriter myWriter = new FileWriter(MYCSV);
-            StringBuilder tempAccountData =new StringBuilder();
-            for (int i=0; i<Main.accountsList.size(); i++) {
+            FileWriter myWriter = new FileWriter(MYCSV); // Define the writer to write to the CSV
+            StringBuilder tempAccountData =new StringBuilder(); // New StringBuilder to put together strings
+            for (int i=0; i<Main.accountsList.size(); i++) { // For every object in ArrayList
+                // Add together variables of object
                 tempAccountData.append(Main.accountsList.get(i).getName()+",");
                 tempAccountData.append(Main.accountsList.get(i).getAddress()+",");
                 tempAccountData.append(Main.accountsList.get(i).getAccountNumber()+",");
@@ -49,15 +49,15 @@ public class CSV
                 if (i<Main.accountsList.size()-1) { // Dont break line for last line
                     tempAccountData.append("\n");
                 }
-                myWriter.write(tempAccountData.toString());
-                tempAccountData.setLength(0);
+                myWriter.write(tempAccountData.toString()); // Write the long string on CSV
+                tempAccountData.setLength(0); // Reset the StringBuilder
             }
+            // Close the writer
             myWriter.flush();
             myWriter.close();
 
-        } catch (IOException e) {
+        } catch (IOException e) { // If the writer cannot write
             System.out.println("Error: "+e);
         }
     }
-    
 }

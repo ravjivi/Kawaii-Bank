@@ -16,6 +16,7 @@ public class Accounts
      * The parameters are used to create the object properties
     */
     public Accounts(String customerName, String customerAddress, String accountNumber, String accountType, double accountBalance) {
+        /* Object variables */
         this.customerName = customerName;
         this.customerAddress = customerAddress;
         this.accountNumber = accountNumber;
@@ -33,8 +34,8 @@ public class Accounts
         this.customerName = customerName;
         this.customerAddress = customerAddress;
         this.accountType = accountType;
-        this.accountBalance = 0;
-        this.accountNumber= createAccNum();
+        this.accountBalance = 0; // New accounts start with $0
+        this.accountNumber= createAccNum(); // Creates specific account number
     }
 
     /**
@@ -52,8 +53,8 @@ public class Accounts
         if (this.accountType.equals("Savings")) {endInt = 0;}
         else if (this.accountType.equals("Everyday")) {endInt = 1;}
         else if (this.accountType.equals("Current")) {endInt = 2;}
-        int midInt = (int)Math.floor(Math.random()*1000000);
-        return("08-0101-"+midInt+"-"+"0"+endInt);
+        int midInt = (int)Math.floor(Math.random()*1000000); // Random 7 digit int
+        return("08-0101-"+midInt+"-"+"0"+endInt); // Returns the account number
     }
 
     /**
@@ -66,14 +67,13 @@ public class Accounts
      * This is useful when you use the ArrayList.get() function but don't know the index
     */
     public static int returnIndex(String id) {
-        for (int i=0; i<Main.accountsList.size(); i++) {
-            if (id.toLowerCase().equals(Main.accountsList.get(i).getName().toLowerCase()) ||
-                id.toLowerCase().equals(Main.accountsList.get(i).getAddress().toLowerCase()) ||
-                id.toLowerCase().equals(Main.accountsList.get(i).getAccountNumber().toLowerCase())) {
-                return i;
+        for (int i=0; i<Main.accountsList.size(); i++) { // For every account in the ArrayList
+            if (id.toLowerCase().equals(Main.accountsList.get(i).getName().toLowerCase()) || // If the ID matches a account name
+                id.toLowerCase().equals(Main.accountsList.get(i).getAccountNumber().toLowerCase())) { // If the ID matches a account number
+                return i; // Returns the account which index in the arrayList the ID belongs to
             } 
         }
-        return -1;
+        return -1; // Else it will return -1 meaning there is no match
     }
     
     /**
@@ -81,19 +81,19 @@ public class Accounts
      * 
      * They are getters that return their respective value for an object
     */
-    public String getName() {
+    public String getName() { // Return account name
         return(this.customerName);
     }
-    public String getAccountType() {
+    public String getAccountType() { // Return account type
         return(this.accountType);
     }
-    public String getAddress() {
+    public String getAddress() { // Return account address
         return(this.customerAddress);
     }
-    public String getAccountNumber() {
+    public String getAccountNumber() { // Return account number
         return(this.accountNumber);
     }
-    public double getBalance() {
+    public double getBalance() { // Return account balance
         return(this.accountBalance);
     }
 
@@ -104,9 +104,9 @@ public class Accounts
      * The use the parameter to determine how much to deposit/withdrawl
     */
     public void depositToAccount(double depAmount) {
-        this.accountBalance += depAmount;
+        this.accountBalance += depAmount; // Add the deposit amount to balance
     }
     public void withdrawFromAccount(double withAmount) {
-        this.accountBalance -= withAmount;
+        this.accountBalance -= withAmount; // Subtrack the withdrawal amount from balance
     }
 }

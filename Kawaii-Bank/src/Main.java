@@ -23,6 +23,7 @@ public class Main
     /*CONSTANTS*/
     // Can be changed by bankteller for the banks liking
     private static final int OVERDRAFTLIMIT = -1000;
+    private static final int DEBTLIMMIT = 0;
     private static final String[] ACCOUNTTYPES = {"Everyday", "Savings", "Current"}; // More account types can be added by adding a new index
 
 
@@ -420,8 +421,8 @@ public class Main
      * Otherwise the withdrawal is fine as is approved
     */
     private static boolean checkDebt(String accID, double withAmount) {
-        if ((accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < 0 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Savings")
-            || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < 0 &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Everyday")
+        if ((accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < DEBTLIMMIT &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Savings")
+            || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < DEBTLIMMIT &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Everyday")
             || (accountsList.get(Accounts.returnIndex(accID)).getBalance()) - withAmount < OVERDRAFTLIMIT &&  accountsList.get(Accounts.returnIndex(accID)).getAccountType().equals("Current")) { 
             // If the amount going to be withdrawn will make the balance negative for everyday or savings
             // Or if the amount withdrawn from a current account will go below a $1000 overdraft
