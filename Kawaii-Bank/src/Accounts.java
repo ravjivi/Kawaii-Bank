@@ -2,12 +2,14 @@ package src;
 
 public class Accounts
 {
+    /* Object variables */
     private String customerName;
     private String accountType;
     private String customerAddress;
     private String accountNumber;
     private double accountBalance;
 
+    private final int MIDACCOUNTNUMBERLENGTH = 7; // Change this to change the middle account number digit length
     /**
      * This method is called 4 String and 1 double parameter
      * 
@@ -54,13 +56,13 @@ public class Accounts
         if (this.accountType.equals("Savings")) {endInt = 0;}
         else if (this.accountType.equals("Everyday")) {endInt = 1;}
         else if (this.accountType.equals("Current")) {endInt = 2;}
-        int midInt = (int)Math.floor(Math.random()*10000000); // Random 7 digit int
+        int midInt = (int)Math.floor(Math.random()*(Math.pow(10, MIDACCOUNTNUMBERLENGTH))); // Random 7 digit int
         
         // Checks for duplicate middle int
         for (int i=0; i<Main.accountsList.size(); i++) {  
             String[] splitAccNum = Main.accountsList.get(i).getAccountNumber().split("-"); // Splits the account number into a array of 4 indexs
             if (splitAccNum[2].equals(midInt)) { // If the new middle int is the same as the middle int of another account
-                midInt = (int)Math.floor(Math.random()*10000000); // New random 7 digit int
+                midInt = (int)Math.floor(Math.random()*(Math.pow(10, MIDACCOUNTNUMBERLENGTH))); // New random 7 digit int
                 i=0; //Reset the loop to check again
             }
         }

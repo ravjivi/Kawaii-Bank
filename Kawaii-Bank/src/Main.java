@@ -460,7 +460,7 @@ public class Main
         // Method variables
         int longestName = 0;
         int longestAdd = 0;
-        int longestBal = 7;
+        int longestBal = 0;
         // Constant because it is the same for every account
         final int ACCNUMWIDTH = 15; 
         final int ACCTYPEWIDTH = 8;
